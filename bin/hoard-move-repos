@@ -26,7 +26,7 @@ for dir in "${1:-.}"/*/; do
   fi
   git-recurse git-fetch-all || continue
   tmpdir=$(mktemp -d "${basetmp}/XXXXXX")
-  if git-recurse git-is-clean && git-each-upstream-branch git-is-upstream; then
+  if git-recurse git-is-clean && git-recurse git-each-upstream-branch git-is-upstream; then
     echo "moving to ${destdir}..."
     mv "${dir}" "${tmpdir}/repo" || continue
   else
