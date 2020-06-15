@@ -9,13 +9,17 @@ current features
   this can help speeding up file lookup
 * keep track of posts on ragezone and commit them as bbcode to a local git repository, tracking
   any changes
+* automatically download links from ragezone posts
 
 # requirements
 
-* a posix shell
+* a posix shell (bash for badown-continue and the ragezone downloader)
 * git 2.3 or newer
 * ruby
 * `gem install --user octokit netrc`
+* curl
+* wget
+* [badown](https://github.com/stck-lzm/badown)
 
 optional but recommended: set up a `~/.netrc` with your github token so you don't get rate limited
 as much. make sure it's not world readable (`chmod 600`)
@@ -66,10 +70,17 @@ calling track again for the same post will just update the description
 see `ragezone-parse-url` for the post argument
 
 ## `ragezone-update`
-check all tracked ragezone posts and commit any changes
+check all tracked ragezone posts and commit any changes, then download any new links that can be
+handled by `hoard-download`
 
 ## `ragezone-parse-url post`
 returns the post id for a ragezone url. fails if the url format is not recognized
+
+## `ragezone-download post`
+download all recognized urls in a post. files are saved to
+`/path/to/hoarder/ragezone-files/post_id`
+
+see `ragezone-parse-url` for the post argument
 
 * post: either a link to the specific post, such as
   `http://forum.ragezone.com/f420/some-post-666-post123/#post123`
@@ -77,6 +88,17 @@ returns the post id for a ragezone url. fails if the url format is not recognize
 
 ## `hoard-github [options] [command [options]]`
 interface for the github api. see `hoard-github --help`
+
+## `hoard-download url`
+download from various file sharing services. currently supports stackstorage, zippyshare, mega,
+mediafire
+
+## `stackstorage-download url`
+download something from stackstorage. resumes partial downloads and doesn't redownload the same file
+
+## `badown-continue url`
+wrapper for [badown](https://github.com/stck-lzm/badown) that resumes downloads like
+`stackstorage-download`
 
 ## `git-is-clean <path>`
 returns true only if the repository is absolutely clean (including no gitignored files present)

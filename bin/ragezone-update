@@ -11,7 +11,7 @@ cd "${baserz}" || exit
 tmp=$(mktemp)
 while read -r id desc; do
   echo
-  echo "=== ${id}: ${desc}"
+  echo "=== updating post ${id}: ${desc}"
   ragezone-get-post "${id}" > "${tmp}" &&
   cp "${tmp}" "./${id}.xml" &&
   git add --update &&
@@ -19,3 +19,9 @@ while read -r id desc; do
   git commit --message "Updated ${id}: ${desc}"
 done < "${rzposts}"
 rm "${tmp}"
+
+while read -r id desc; do
+  echo
+  echo "=== downloading post ${id}: ${desc}"
+  ragezone-download "${id}"
+done < "${rzposts}"

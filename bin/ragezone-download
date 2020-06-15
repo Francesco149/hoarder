@@ -1,0 +1,15 @@
+#!/bin/sh
+
+self=$(realpath "$0")
+selfdir=$(dirname "${self}")
+export PATH="${selfdir}:${PATH}"
+# shellcheck source=./hoard-source-config
+. "${selfdir}/hoard-source-config"
+
+id=$(ragezone-parse-url "$1") || exit
+destdir="${baserzfiles}/${id}"
+mkdir -p "${destdir}" || exit
+cd "${destdir}" || exit
+grep -o 'http[^][[:space:]"]*' < "${baserz}/${id}.xml" | while read -r url; do
+  hoard-download "${url}"
+done

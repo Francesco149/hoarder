@@ -1,0 +1,11 @@
+#!/bin/sh
+
+url="$1"
+case "${url}" in
+  *stackstorage.com/s/*)
+    stackstorage-download "${url}" || exit ;;
+  *mega.nz/*|*mediafire.com/*|*zippyshare.com/v/*)
+    badown-continue "${url}" || exit ;;
+  *)
+    echo "W: ignoring unknown url ${url}" ;;
+esac
