@@ -1,3 +1,5 @@
 #!/bin/sh
 
-"$@" && git submodule foreach --recursive "$@"
+"$@" &&
+! git submodule >/dev/null 2>&1 ||
+  git submodule foreach --recursive "$@" || exit
