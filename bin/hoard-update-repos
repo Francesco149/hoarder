@@ -8,8 +8,9 @@ export PATH="${selfdir}:${PATH}"
 
 # - do a normal fetch
 # - force clean the current branch
-# - fix detached head by checking out the first branch in the list
+# - detach head so we can delete branches
 # - iterate every remote branch and ensure there's a local branch that tracks upstream for it
+# - fix detached head by checking out the first branch in the list
 # - checkout and hard reset every branch to upstream
 
 for dir in "${basegit}"/*/*/; do
@@ -18,17 +19,17 @@ for dir in "${basegit}"/*/*/; do
   cd "${dir}" || continue
   git-fetch-all &&
   git-super-clean &&
-  git checkout "$(git branch --format '%(refname:short)' | grep '^[^(].*' | sed 1q)" &&
-  git reset --hard HEAD || continue
+  git checkout --detach || continue
 
   git branch --remotes | grep -v '\->' | while read -r branch; do
     localbranch=$(echo "${branch}" | cut -d'/' -f2-)
-    [ "${localbranch}" = "master" ] && continue
     if ! git rev-parse --abbrev-ref "${branch}@{upstream}" >/dev/null 2>&1; then
       git branch --delete --force "${localbranch}" >/dev/null 2>&1
       git branch --track "${localbranch}" "${branch}"
     fi
   done
 
+  git checkout "$(git branch --format '%(refname:short)' | grep '^[^(].*' | sed 1q)" &&
+  git reset --hard HEAD &&
   git-each-upstream-branch git-checkout-and-reset || continue
 done
