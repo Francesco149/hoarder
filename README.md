@@ -52,6 +52,9 @@ lists of repos are kept at /path/to/hoard/github-repos-username
 ## `hoard-github [options] [command [options]]`
 interface for the github api. see `hoard-github --help`
 
+## `ragezone-get-post`
+gets bbcode for a post on ragezone. run it without arguments for help
+
 ## `git-is-clean <path>`
 returns true only if the repository is absolutely clean (including no gitignored files present)
 note that this only checks that it's locally clean. it could still have diverged from upstream
