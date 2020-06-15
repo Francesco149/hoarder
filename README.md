@@ -45,7 +45,7 @@ checks every subdirectory (not recursively) and if it's a git repo it creates a 
 "/path/to/hoard/git". if the git repo is already considered clean (all branches exist upstream and
 no unstaged changes) it will be moved directly
 
-## `hoard-clone-starred-repos`
+## `github-clone-starred-repos`
 clones all github repos starred by `HOARDER_GITHUB_STARRED_USERS`. keeps track of the starred repos
 that have already been seen to not abuse the github api too hard
 
