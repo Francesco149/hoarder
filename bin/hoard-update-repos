@@ -25,7 +25,7 @@ for dir in "${basegit}"/*/*/; do
     localbranch=$(echo "${branch}" | cut -d'/' -f2-)
     [ "${localbranch}" = "master" ] && continue
     if ! git rev-parse --abbrev-ref "${branch}@{upstream}" >/dev/null 2>&1; then
-      git branch --delete --force "${localbranch}" /dev/null 2>&1
+      git branch --delete --force "${localbranch}" >/dev/null 2>&1
       git branch --track "${localbranch}" "${branch}"
     fi
   done
