@@ -51,9 +51,6 @@ that have already been seen to not abuse the github api too hard
 
 lists of repos are kept at /path/to/hoard/github-repos-username
 
-## `hoard-github [options] [command [options]]`
-interface for the github api. see `hoard-github --help`
-
 ## `ragezone-get-post post`
 gets bbcode for a post on ragezone. NOTE: output is wrapped in some weird xml node
 
@@ -77,6 +74,9 @@ returns the post id for a ragezone url. fails if the url format is not recognize
 * post: either a link to the specific post, such as
   `http://forum.ragezone.com/f420/some-post-666-post123/#post123`
   or the post id (123 in this example)
+
+## `hoard-github [options] [command [options]]`
+interface for the github api. see `hoard-github --help`
 
 ## `git-is-clean <path>`
 returns true only if the repository is absolutely clean (including no gitignored files present)
