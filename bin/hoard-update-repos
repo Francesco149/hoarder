@@ -6,12 +6,20 @@ export PATH="${selfdir}:${PATH}"
 # shellcheck source=./hoard-source-config
 . "${selfdir}/hoard-source-config"
 
+# - do a normal fetch
+# - force clean the current branch
+# - detach head to create all the remote branches
+# - reattach head by checking out the first branch
+# - checkout every branch and do a hard reset to upstream
+
 for dir in "${basegit}"/*/*/; do
   echo
   echo "=== ${dir}"
   cd "${dir}" || continue
   git-fetch-all &&
   git-super-clean &&
+  git checkout --detach &&
+  git fetch origin '+refs/heads/*:refs/heads/*' &&
   git checkout "$(git branch --format '%(refname:short)' | grep '^[^(].*' | sed 1q)" &&
   git-each-upstream-branch git-checkout-and-reset
 done
