@@ -3,4 +3,6 @@
 base=$(dirname "$1")
 dirname=$(basename "$1")
 letter=$(echo "${dirname}" | cut -c1)
-echo "${base}/${letter}/${dirname}"
+result="${base}/${letter}/${dirname}"
+mkdir -p "$(dirname "${result}")" || exit
+echo "${result}"

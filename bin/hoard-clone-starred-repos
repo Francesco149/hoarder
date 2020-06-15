@@ -16,7 +16,7 @@ for user in ${HOARDER_GITHUB_STARRED_USERS}; do
   while read -r name url; do
     echo
     echo "=== ${url}"
-    destdir=$(hoard-prefix-dir "${basegit}/${name}")
+    destdir=$(hoard-prefix-dir "${basegit}/${name}") || continue
     [ -d "${destdir}" ] && echo "already cloned" && continue
     tmpdir=$(mktemp -d "${basetmp}/XXXXXX")
     git clone --recursive "--jobs=${HOARDER_GIT_JOBS}" "${url}" "${tmpdir}/repo" &&

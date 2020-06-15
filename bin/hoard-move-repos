@@ -12,12 +12,11 @@ for dir in "${1:-.}"/*/; do
   echo
   echo "=== ${dir}"
   name=$(basename "${dir}")
-  destdir=$(hoard-prefix-dir "${basegit}/${name}")
+  destdir=$(hoard-prefix-dir "${basegit}/${name}") || continue
   if [ -d "${destdir}" ] || [ -f "${destdir}" ]; then
     echo "W: already exists, skipping. remove/rename it if you want this to be moved"
     continue
   fi
-  mkdir -p "$(dirname "${destdir}")" || continue
 
   cd "${dir}" || continue
   if [ -z "$(git -C "${dir}" remote)" ]; then
