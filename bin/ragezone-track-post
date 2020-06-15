@@ -9,4 +9,4 @@ export PATH="${selfdir}:${PATH}"
 id=$(ragezone-parse-url "$1") || exit
 shift
 ragezone-untrack-post "${id}"
-echo "${id} $@" >> "${rzposts}"
+echo "${id} $*" >> "${rzposts}"
