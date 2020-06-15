@@ -8,4 +8,7 @@ export HOARDER_GIT_JOBS="${HOARDER_GIT_JOBS:-$(nproc --all)}"
 
 export basegit="${HOARDER_DIR}/git"
 export basetmp="${HOARDER_DIR}/tmp"
-mkdir -p "${basegit}" "${basetmp}" || exit
+export baserz="${HOARDER_DIR}/ragezone"
+export rzposts="${HOARDER_DIR}/ragezone-posts"
+touch "${rzposts}"
+mkdir -p "${basegit}" "${basetmp}" "${baserz}" || exit

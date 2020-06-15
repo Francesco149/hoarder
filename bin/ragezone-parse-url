@@ -1,0 +1,12 @@
+#!/bin/sh
+
+case "$1" in
+  http://*.ragezone.com/*/*-post*)
+    echo "$1" | sed -n 's/^.*-post\([0-9]\+\).*$/\1/p' ;;
+  *)
+    if ! id=$(echo "$1" | grep '^[0-9]\+$'); then
+      exit 1
+    fi
+    echo "${id}"
+    ;;
+esac

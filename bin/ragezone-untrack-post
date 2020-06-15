@@ -1,0 +1,10 @@
+#!/bin/sh
+
+self=$(realpath "$0")
+selfdir=$(dirname "${self}")
+export PATH="${selfdir}:${PATH}"
+# shellcheck source=./hoard-source-config
+. "${selfdir}/hoard-source-config"
+
+id=$(ragezone-parse-url "$1") || exit
+sed -i "/^${id}[[:space:]]\+.*$/d" "${rzposts}"

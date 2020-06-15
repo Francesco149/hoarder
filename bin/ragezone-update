@@ -1,0 +1,21 @@
+#!/bin/sh
+
+self=$(realpath "$0")
+selfdir=$(dirname "${self}")
+export PATH="${selfdir}:${PATH}"
+# shellcheck source=./hoard-source-config
+. "${selfdir}/hoard-source-config"
+
+cd "${baserz}" || exit
+[ -d ./.git ] || git init
+tmp=$(mktemp)
+while read -r id desc; do
+  echo
+  echo "=== ${id}: ${desc}"
+  ragezone-get-post "${id}" > "${tmp}" &&
+  cp "${tmp}" "./${id}.xml" &&
+  git add --update &&
+  git add --all &&
+  git commit --message "Updated ${id}: ${desc}"
+done < "${rzposts}"
+rm "${tmp}"

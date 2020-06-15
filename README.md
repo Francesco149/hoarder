@@ -7,6 +7,8 @@ current features
 * keep archived repos up to date and clean
 * all hoard directories are split into subdirectories based on the first letter of the name.
   this can help speeding up file lookup
+* keep track of posts on ragezone and commit them as bbcode to a local git repository, tracking
+  any changes
 
 # requirements
 
@@ -52,8 +54,29 @@ lists of repos are kept at /path/to/hoard/github-repos-username
 ## `hoard-github [options] [command [options]]`
 interface for the github api. see `hoard-github --help`
 
-## `ragezone-get-post`
-gets bbcode for a post on ragezone. run it without arguments for help
+## `ragezone-get-post post`
+gets bbcode for a post on ragezone. NOTE: output is wrapped in some weird xml node
+
+see `ragezone-parse-url` for the post argument
+
+## `ragezone-track-post post description`
+## `ragezone-untrack-post post`
+tracks the given post. tracked posts will be committed to a git repository in
+`/path/to/hoarder/ragezone` as bbcode and kept updated by `ragezone-update`
+
+calling track again for the same post will just update the description
+
+see `ragezone-parse-url` for the post argument
+
+## `ragezone-update`
+check all tracked ragezone posts and commit any changes
+
+## `ragezone-parse-url post`
+returns the post id for a ragezone url. fails if the url format is not recognized
+
+* post: either a link to the specific post, such as
+  `http://forum.ragezone.com/f420/some-post-666-post123/#post123`
+  or the post id (123 in this example)
 
 ## `git-is-clean <path>`
 returns true only if the repository is absolutely clean (including no gitignored files present)
