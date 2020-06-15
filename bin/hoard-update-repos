@@ -1,0 +1,16 @@
+#!/bin/sh
+
+self=$(realpath "$0")
+selfdir=$(dirname "${self}")
+export PATH="${selfdir}:${PATH}"
+# shellcheck source=./hoard-source-config
+. "${selfdir}/hoard-source-config"
+
+for dir in "${basegit}"/*/*/; do
+  echo
+  echo "=== ${dir}"
+  cd "${dir}" || continue
+  git-fetch-all &&
+  git-super-clean &&
+  git-each-upstream-branch git-checkout-and-reset
+done

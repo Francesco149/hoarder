@@ -1,0 +1,3 @@
+#!/bin/sh
+
+git checkout "$2" && git reset --hard "$1"

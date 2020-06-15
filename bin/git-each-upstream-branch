@@ -1,0 +1,8 @@
+#!/bin/sh
+
+git symbolic-ref -q HEAD >/dev/null || exit # no detached heads. no idea how to determine upstream
+git for-each-ref --format='%(refname:short)' refs/heads/* |
+while read -r branch; do
+  upstream=$(git rev-parse --abbrev-ref "${branch}@{upstream}" 2>/dev/null) || return
+  "$@" "${upstream}" "${branch}" || return
+done

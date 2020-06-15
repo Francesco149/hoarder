@@ -1,0 +1,43 @@
+#!/bin/sh
+
+self=$(realpath "$0")
+selfdir=$(dirname "${self}")
+export PATH="${selfdir}:${PATH}"
+# shellcheck source=./hoard-source-config
+. "${selfdir}/hoard-source-config"
+
+for dir in "${1:-.}"/*/; do
+  dir=$(realpath "${dir}")
+  [ ! -d "${dir}/.git" ] && continue
+  echo
+  echo "=== ${dir}"
+  name=$(basename "${dir}")
+  destdir=$(hoard-prefix-dir "${basegit}/${name}")
+  if [ -d "${destdir}" ] || [ -f "${destdir}" ]; then
+    echo "W: already exists, skipping. remove/rename it if you want this to be moved"
+    continue
+  fi
+  mkdir -p "$(dirname "${destdir}")" || continue
+
+  cd "${dir}" || continue
+  if [ -z "$(git -C "${dir}" remote)" ]; then
+    echo "W: no remotes found, skipping"
+    continue
+  fi
+  git-recurse git-fetch-all || continue
+  tmpdir=$(mktemp -d "${basetmp}/XXXXXX")
+  if git-recurse git-is-clean && git-each-upstream-branch git-is-upstream; then
+    echo "moving to ${destdir}..."
+    mv "${dir}" "${tmpdir}/repo" || continue
+  else
+    echo "not clean, making a clean copy in ${destdir}..."
+    cp -r "${dir}" "${tmpdir}/repo" || continue
+  fi
+
+  if ! git-super-clean "${tmpdir}/repo"; then
+    echo "W: failed to clean! ignoring"
+    rm -rf "${tmpdir}"
+    continue
+  fi
+  mv "${tmpdir}/repo" "${destdir}" || rm -rf "${tmpdir}" "${destdir}" >dev/null 2>&1
+done

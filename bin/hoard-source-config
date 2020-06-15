@@ -1,0 +1,11 @@
+#!/bin/sh
+
+config="${HOARDER_CONFIG_DIR:-$HOME/.config/hoarder/config.sh}"
+# shellcheck source=/home/loli/.config/hoarder/config.sh
+[ -f "${config}" ] && . "${config}"
+export HOARDER_DIR="${HOARDER_DIR:-$HOME/hoard}"
+export HOARDER_GIT_JOBS="${HOARDER_GIT_JOBS:-$(nproc --all)}"
+
+export basegit="${HOARDER_DIR}/git"
+export basetmp="${HOARDER_DIR}/tmp"
+mkdir -p "${basegit}" "${basetmp}" || exit

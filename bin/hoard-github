@@ -1,0 +1,62 @@
+#!/bin/env ruby
+# utility to interface with github
+
+require 'optparse'
+require 'time'
+require 'octokit'
+require 'netrc'
+
+options = {}
+
+subtext = <<~HELP
+  commands:
+    starred  lists repositories starred by a given user, sorted by date starred in descending order
+
+    see #{ARGV} [command] --help to get help on a specific command
+HELP
+
+global = OptionParser.new { |opts|
+  opts.banner = "Usage: #{ARGV} [options] [command [options]]"
+  opts.separator ''
+  opts.separator subtext
+}
+
+subcommands = {
+  'starred' => OptionParser.new { |opts|
+    opts.banner = 'Usage: starred [options] USERNAME'
+    opts.on('--after DATE', 'only fetch stars newer than this date. date format is anything ' +
+      'ruby can understand, such as "2020-04-09 06:34:43 UTC"') { |v|
+      options[:after] = v
+    }
+  }
+}
+
+global.order!
+command = ARGV.shift
+global.parse %w[--help] unless command
+raise "command '#{command}' does not exist" unless subcommands[command]
+
+subcommands[command].order!
+
+case command
+when 'starred'
+  username = ARGV.shift
+  raise 'no username specified' unless username
+
+  _, token = Netrc.read['api.github.com']
+  octo = token ? Octokit::Client.new(:access_token => token) : Octokit
+  after = Time.parse(options[:after] || '1970-01-01 00:00:00 UTC')
+  stars = Enumerator.new { |y|
+    opts = { accept: 'application/vnd.github.v3.star+json' }
+    octo.starred(username, opts).each { |x| y << x }
+    until octo.last_response.rels[:next].nil?
+      octo.get(octo.last_response.rels[:next].href, opts).each { |x| y << x }
+    end
+  }
+  stars.take_while { |x| (x.starred_at <=> after) >= 0 }.each { |star|
+    repo = star.repo
+    puts("#{star.starred_at.xmlschema} #{repo.name} #{repo.ssh_url} #{repo.description}")
+  }
+else
+  global.parse %w[--help]
+end

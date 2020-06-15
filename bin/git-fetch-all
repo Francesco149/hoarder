@@ -1,0 +1,12 @@
+#!/bin/sh
+
+self=$(realpath "$0")
+selfdir=$(dirname "${self}")
+export PATH="${selfdir}:${PATH}"
+# shellcheck source=./hoard-source-config
+. "${selfdir}/hoard-source-config"
+
+cd "${1:-.}" || exit
+
+# requires git 2.3 or newer https://github.com/junegunn/vim-plug/issues/161
+GIT_TERMINAL_PROMPT=0 git fetch --all "--jobs=${HOARDER_GIT_JOBS}"

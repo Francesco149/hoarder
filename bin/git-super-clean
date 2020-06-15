@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# https://github.com/ericherman/code-snips/blob/master/shell/git-spotless
+cd "${1:-.}" || exit
+git-recurse git clean -dffx

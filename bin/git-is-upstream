@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# basically if we can find the commit in any remote we good
+git branch -a --contains "${2:-HEAD}" |
+  grep --quiet --silent -- "[[:space:]]*remotes/${1}[[:space:]]*$"
