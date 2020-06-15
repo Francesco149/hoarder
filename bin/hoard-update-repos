@@ -12,5 +12,6 @@ for dir in "${basegit}"/*/*/; do
   cd "${dir}" || continue
   git-fetch-all &&
   git-super-clean &&
+  git reset --hard $(git branch --format '%(refname)' | grep '^[^(].*') &&
   git-each-upstream-branch git-checkout-and-reset
 done
