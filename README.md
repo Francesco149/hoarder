@@ -83,7 +83,7 @@ fails when upstream branch cannot be determined or when command fails
 runs `<command>` on the git repo and all of its submodules recursively
 
 ## `git-checkout-and-reset <upstream-branch> <branch>`
-checks out branch and hard resets it to upstream-branch
+does a `git-super-clean`, checks out branch and hard resets it to upstream-branch
 
 ## `hoard-prefix-dir <path>`
 adjust path so the last element is prefixed by a directory named according to the first
