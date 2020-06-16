@@ -17,10 +17,10 @@ for user in ${HOARDER_GITHUB_STARRED_USERS}; do
   mv "${tmp}" "${repos_file}"
   cut -d' ' -f2-3 < "${repos_file}" |
   while read -r name url; do
+    destdir=$(hoard-prefix-dir "${basegit}/${name}") || continue
+    [ -d "${destdir}" ] && continue
     echo
     echo "=== ${url}"
-    destdir=$(hoard-prefix-dir "${basegit}/${name}") || continue
-    [ -d "${destdir}" ] && echo "already cloned" && continue
     tmpdir=$(mktemp -d "${basetmp}/XXXXXX")
     git clone --recursive "--jobs=${HOARDER_GIT_JOBS}" "${url}" "${tmpdir}/repo" &&
     mv "${tmpdir}/repo" "${destdir}"
