@@ -24,5 +24,6 @@ for user in ${HOARDER_GITHUB_STARRED_USERS}; do
     tmpdir=$(mktemp -d "${basetmp}/XXXXXX")
     git clone --recursive "--jobs=${HOARDER_GIT_JOBS}" "${url}" "${tmpdir}/repo" &&
     mv "${tmpdir}/repo" "${destdir}"
+    rm -rf "${tmpdir}"
   done
 done
