@@ -6,7 +6,7 @@ export PATH="${selfdir}:${PATH}"
 # shellcheck source=./hoard-source-config
 . "${selfdir}/hoard-source-config"
 
-for dir in "${1:-.}"/*/; do
+for dir in "$(realpath ${1:-.})"/*/; do
   dir=$(realpath "${dir}")
   [ ! -d "${dir}/.git" ] && continue
   echo
