@@ -25,3 +25,5 @@ while read -r id desc; do
   echo "=== downloading post ${id}: ${desc}"
   ragezone-download "${id}"
 done < "${rzposts}"
+
+exit 0
