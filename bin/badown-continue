@@ -4,6 +4,7 @@ eval "$(sed -n '/[[:space:]]*function showhelp/q;p' < "$(which badown)")"
 
 function file_downdec {
   [ -z "$3" ] || [ -z "$4" ] && echo "empty keys, assuming the file is gone" && return 1
+  [ -z "$2" ] && echo "empty filename, assuming the file is gone" && return 1
   [ -f "$2" ] && echo "this file was already downloaded and decrypted, skipping" && return 0
   wget -O "$2".encrypted $speed -q --show-progress --continue "$1"
   openssl enc -d -aes-128-ctr -K "$3" -iv "$4" < "$2".encrypted > "$2"
