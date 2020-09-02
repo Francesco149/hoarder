@@ -1,0 +1,13 @@
+#!/bin/sh
+# Usage: curl https://artist.bandcamp.com/album/... | bandcamp-rename
+# assumes you're in a directory with cdparanoia ripped tracks
+
+grep '^[0-9]\+\.' | sort -n > tracklist.txt
+pad="$(grep --only-matching '^[0-9]\+' < tracklist.txt |
+       tail --lines 1 | tr --delete '\n' | wc --bytes)"
+
+while read -r num rest; do
+  num="$(printf "%0${pad}d" "${num%.}")"
+  orig="track${num}.cdda.wav"
+  [ -f "$orig" ] && mv -vi "$orig" "$num $rest.wav"
+done < tracklist.txt
