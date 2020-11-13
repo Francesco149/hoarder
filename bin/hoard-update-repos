@@ -47,5 +47,5 @@ find "${basegit}" -name '*.git' -prune -exec git -C {} show HEAD:.gitmodules 2>/
   git config --file - --get-regexp '\.url$' | cut -d' ' -f2- | grep -v '[$/]\.\.' | clone_repos
 
 echo ":: updating"
-# TODO: use "${HOARDER_GIT_JOBS}"
-find "${basegit}" -name '*.git' -prune -exec git -C {} remote update \;
+find "${basegit}" -name '*.git' -prune -print0 |
+  xargs -0 -P "${HOARDER_GIT_JOBS}" -l git remote update -C
