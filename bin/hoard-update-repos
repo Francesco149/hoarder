@@ -6,30 +6,46 @@ export PATH="${selfdir}:${PATH}"
 # shellcheck source=./hoard-source-config
 . "${selfdir}/hoard-source-config"
 
-# - do a normal fetch
-# - force clean the current branch
-# - detach head so we can delete branches
-# - iterate every remote branch and ensure there's a local branch that tracks upstream for it
-# - fix detached head by checking out the first branch in the list
-# - checkout and hard reset every branch to upstream
+allrepos="${HOARDER_DIR}/git-repos"
 
-for dir in "${basegit}"/*/*/; do
-  echo
-  echo "=== ${dir}"
-  cd "${dir}" || continue
-  git-fetch-all &&
-  git-super-clean &&
-  git checkout --detach || continue
-
-  git branch --remotes | grep -v '\->' | while read -r branch; do
-    localbranch=$(echo "${branch}" | cut -d'/' -f2-)
-    if ! git rev-parse --abbrev-ref "${branch}@{upstream}" >/dev/null 2>&1; then
-      git branch --delete --force "${localbranch}" >/dev/null 2>&1
-      git branch --track "${localbranch}" "${branch}"
-    fi
-  done
-
-  git checkout "$(git branch --format '%(refname:short)' | grep '^[^(].*' | sed 1q)" &&
-  git reset --hard HEAD &&
-  git-each-upstream-branch git-checkout-and-reset || continue
+echo ":: updating github starred"
+# update github starred repos and add them to allrepos
+for user in ${HOARDER_GITHUB_STARRED_USERS}; do
+  repos_file="${HOARDER_DIR}/github-repos-${user}"
+  touch "${repos_file}"
+  last_time=$(tail -n 1 < "${repos_file}" | cut -d' ' -f1)
+  last_time="${last_time:-1970-01-01T00:00:00+0000}"
+  hoard-github starred --after "${last_time}" "${user}" | tac >> "${repos_file}"
+  tmp=$(mktemp)
+  uniq < "${repos_file}" > "${tmp}" || continue
+  mv "${tmp}" "${repos_file}"
+  tmp=$(mktemp)
+  cut -d' ' -f3 < "${repos_file}" | cat - "$allrepos" | sort | uniq > "$tmp"
+  mv "$tmp" "$allrepos"
 done
+
+clone_repos() {
+  xargs -P "${HOARDER_GIT_JOBS}" -l sh -c '
+    d=$(dirname "$(echo "$@" | sed "s|^.*//||g;s|^.*@||g;s|\([^/]*\):|\1/|g")")
+    [ -d "$d" ] && exit 0
+    echo "cloning $*"
+    echo "into    $d"
+    olddir=$(pwd)
+    mkdir -p "$d" && cd "$d" &&
+    git clone --mirror "$@"
+    cd "$olddir"
+    exit 0
+  ' /bin/sh
+}
+
+echo ":: cloning"
+cd "${basegit}"
+clone_repos < "$allrepos"
+
+echo ":: cloning submodules"
+find "${basegit}" -name '*.git' -prune -exec git -C {} show HEAD:.gitmodules 2>/dev/null \; |
+  git config --file - --get-regexp '\.url$' | cut -d' ' -f2- | clone_repos
+
+echo ":: updating"
+# TODO: use "${HOARDER_GIT_JOBS}"
+find "${basegit}" -name '*.git' -prune -exec git -C {} remote update \;
