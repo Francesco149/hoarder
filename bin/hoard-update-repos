@@ -48,4 +48,4 @@ find "${basegit}" -name '*.git' -prune -exec git -C {} show HEAD:.gitmodules 2>/
 
 echo ":: updating"
 find "${basegit}" -name '*.git' -prune -print0 |
-  xargs -0 -P "${HOARDER_GIT_JOBS}" -l git remote update -C
+  xargs -0 -P "${HOARDER_GIT_JOBS}" -l sh -c 'git -C "$1" remote update' /bin/sh
