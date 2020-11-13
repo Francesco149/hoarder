@@ -44,7 +44,7 @@ clone_repos < "$allrepos"
 
 echo ":: cloning submodules"
 find "${basegit}" -name '*.git' -prune -exec git -C {} show HEAD:.gitmodules 2>/dev/null \; |
-  git config --file - --get-regexp '\.url$' | cut -d' ' -f2- | clone_repos
+  git config --file - --get-regexp '\.url$' | cut -d' ' -f2- | grep -v '[$/]\.\.' | clone_repos
 
 echo ":: updating"
 # TODO: use "${HOARDER_GIT_JOBS}"
