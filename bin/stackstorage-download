@@ -54,22 +54,26 @@ download() {
   [ "$STACKDL_DEBUG" ] && echo "csrf token: ${csrf_token}"
 
   tstamp="$(( $(date +%s) * 1000 ))"
-  filename=$(
-    request --silent \
-      --url "${base}public-share/${id}/list/?public=true&token=${id}&type=file&_=${tstamp}" \
-      -H 'Accept: application/json, text/javascript, */*; q=0.01' \
-      -H 'Omit-Authentication-Header: true' \
-      -H 'Sec-Fetch-Site: same-origin' \
-      -H 'Sec-Fetch-Mode: cors' \
-      -H 'Sec-Fetch-Dest: empty' \
-      -H "X-CSRF-Token: ${csrf_token}" \
-      -H 'X-Requested-With: XMLHttpRequest' \
-      -H 'Content-Type: application/json' \
-      -H "Referer: $1" \
-      --cookie "${jar}" |
-    sed -n 's/^.*"path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*$/\1/p'
-  )
+  finfo=$(mktemp)
+  request --silent \
+    --url "${base}public-share/${id}/list/?public=true&token=${id}&type=file&_=${tstamp}" \
+    -H 'Accept: application/json, text/javascript, */*; q=0.01' \
+    -H 'Omit-Authentication-Header: true' \
+    -H 'Sec-Fetch-Site: same-origin' \
+    -H 'Sec-Fetch-Mode: cors' \
+    -H 'Sec-Fetch-Dest: empty' \
+    -H "X-CSRF-Token: ${csrf_token}" \
+    -H 'X-Requested-With: XMLHttpRequest' \
+    -H 'Content-Type: application/json' \
+    -H "Referer: $1" \
+    --cookie "${jar}" > "$finfo"
+  filename=$(sed -n 's/^.*"path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*$/\1/p' < "$finfo")
+  filesize=$(sed -n 's/^.*"fileSize"[[:space:]]*:[[:space:]]*\([0-9]*\).*$/\1/p' < "$finfo")
+  rm "$finfo"
+
   filename="./${filename}"
+
+  [ "$SIZE_ONLY" ] && echo "$filesize:$filename" && return
 
   [ "$STACKDL_DEBUG" ] && echo "=== downloading to ${filename}"
   mkdir -p "$(dirname "${filename}")" || return

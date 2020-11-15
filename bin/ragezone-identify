@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# ragezone files used to be stored differently, this helps migrating old files to the new dirs
+# NOTE: this is not to be 100% trusted. it only uses filename and size to try and match files
+
+self=$(realpath "$0")
+selfdir=$(dirname "${self}")
+export PATH="${selfdir}:${PATH}"
+# shellcheck source=./hoard-source-config
+. "${selfdir}/hoard-source-config"
+
+id=$(ragezone-parse-url "$1") || exit
+destdir="${baserzfiles}/${id}"
+mkdir -p "${destdir}" || exit
+cd "${destdir}" || exit
+grep -o 'http[^][[:space:]"]*' < "${baserz}/${id}.xml" | while read -r url; do
+  dir=$(echo "$url" | sha1sum | cut -d' ' -f1)
+  sizename=$(SIZE_ONLY=1 hoard-download "${url}") || continue
+  echo "# $sizename"
+  size=$(echo "$sizename" | cut -d: -f1)
+  fname=$(echo "$sizename" | cut -d: -f2-)
+  name=$(basename "$fname")
+  find . -type f | while read -r f; do
+    if [ "$(wc -c "$f" | cut -d' ' -f1)" == "$size" ]; then
+      mvdest="${dir}/${fname}"
+      mkdir -p "$(dirname "$mvdest")"
+      mv -v "$f" "$mvdest"
+    elif [ "$(basename "$f")" == "$name" ]; then
+      echo "!!!!!!!!! $f"
+    fi
+  done
+done

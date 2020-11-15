@@ -2,9 +2,17 @@
 
 eval "$(sed -n '/[[:space:]]*function showhelp/q;p' < "$(which badown)")"
 
+function print_size {
+  [ ! "$SIZE_ONLY" ] && return 1
+  size=$(wget -q --spider --server-response --compression=none -O - "$1" 2>&1 |
+    tr '[:upper:]' '[:lower:]' | awk '/content-length:/ { print $2 }')
+  echo "$size:$2"
+}
+
 function file_downdec {
   [ -z "$3" ] || [ -z "$4" ] && echo "empty keys, assuming the file is gone" && return 1
   [ -z "$2" ] && echo "empty filename, assuming the file is gone" && return 1
+  print_size "$1" "$2" && return 0
   [ -f "$2" ] && echo "this file was already downloaded and decrypted, skipping" && return 0
   wget -O "$2".encrypted $speed -q --show-progress --continue "$1"
   openssl enc -d -aes-128-ctr -K "$3" -iv "$4" < "$2".encrypted > "$2"
@@ -12,6 +20,7 @@ function file_downdec {
 }
 
 function file_down {
+  print_size "$1" "$2" && return 0
   wget -O "$2" $speed -q --show-progress --continue "$1"
 }
 
